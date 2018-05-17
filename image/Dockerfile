@@ -1,12 +1,9 @@
-FROM        registry.access.redhat.com/rhel7:latest
+FROM        docker.io/centos:latest
 
 USER        root
 
-RUN         rpm --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release && \
-            yum-config-manager --disable "*" && \
-            yum-config-manager --enable rhel-7-server-rpms && \
-            yum update-minimal -y --security --sec-severity=Important --sec-severity=Critical --setopt=tsflags=nodocs && \
-            yum install -y --setopt=tsflags=nodocs git yum-utils unzip golang bzr --enablerepo=rhel-7-server-optional-rpms && \
+RUN         yum update -y && \
+            yum install -y --setopt=tsflags=nodocs git yum-utils unzip golang bzr && \
             yum -y clean all && \
             rm -rf /var/cache/yum && \
             go get github.com/coreos/clair && \
