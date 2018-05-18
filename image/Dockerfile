@@ -3,7 +3,7 @@ FROM        docker.io/centos:latest
 USER        root
 
 RUN         yum update -y && \
-            yum install -y --setopt=tsflags=nodocs git yum-utils unzip golang bzr && \
+            yum install -y --setopt=tsflags=nodocs git yum-utils unzip golang bzr gettext && \
             yum -y clean all && \
             rm -rf /var/cache/yum
 
@@ -11,7 +11,7 @@ ENV         GOPATH /go
 ENV         PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 RUN         mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
-            chmod -R 777 "$GOPATH" && \
+            chmod -R 770 "$GOPATH" && \
             go get github.com/coreos/clair && \
             go install github.com/coreos/clair/cmd/clair && \
             mkdir /clair && \
