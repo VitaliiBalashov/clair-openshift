@@ -13,8 +13,7 @@ RUN         yum update -y && \
             touch /clair/config/config.yaml && \
             mkdir /clair/bin && \
             chmod 770 /clair && \
-            mv /root/go/bin/clair /clair/bin/ && \
-            rm -rf /root/go
+            cp /root/go/bin/clair /clair/bin/
 
 ADD         config/config.yaml.template /clair/config/
 ADD         scripts/run-clair.sh /clair/bin/
