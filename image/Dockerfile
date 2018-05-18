@@ -5,7 +5,13 @@ USER        root
 RUN         yum update -y && \
             yum install -y --setopt=tsflags=nodocs git yum-utils unzip golang bzr && \
             yum -y clean all && \
-            rm -rf /var/cache/yum && \
+            rm -rf /var/cache/yum
+
+ENV         GOPATH /go
+ENV         PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+
+RUN         mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
+            chmod -R 777 "$GOPATH" && \
             go get github.com/coreos/clair && \
             go install github.com/coreos/clair/cmd/clair && \
             mkdir /clair && \
@@ -13,7 +19,7 @@ RUN         yum update -y && \
             touch /clair/config/config.yaml && \
             mkdir /clair/bin && \
             chmod 770 /clair && \
-            cp /root/go/bin/clair /clair/bin/
+            cp /go/bin/clair /clair/bin/
 
 ADD         config/config.yaml.template /clair/config/
 ADD         scripts/run-clair.sh /clair/bin/
