@@ -1,0 +1,172 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: clair
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: clair
+    name: clair
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: clair
+    name: clair
+  spec:
+    replicas: 1
+    selector:
+      app: clair
+      deploymentconfig: clair
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: clair
+          deploymentconfig: clair
+      spec:
+        containers:
+        - env:
+          - name: POSTGRES_USERNAME
+            value: ${POSTGRES_USERNAME}
+          - name: POSTGRES_PASSWORD
+            value: ${POSTGRES_PASSWORD}
+          - name: POSTGRES_IP
+            value: ${POSTGRES_IP}
+          - name: POSTGRES_PORT
+            value: ${POSTGRES_PORT}
+          - name: POSTGRES_DATABASE
+            value: ${POSTGRES_DATABASE}
+          image: ${IMAGE_SERVER}/${IMAGE_STREAM_NAMESPACE}/${IMAGE_NAME}:${IMAGE_STREAM_TAG}
+          imagePullPolicy: IfNotPresent
+          name: clair
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 6061
+            timeoutSeconds: 2
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 6061
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: clair
+    labels:
+      app: clair
+  spec:
+    ports:
+    - name: clair-api
+      port: 6060
+      protocol: TCP
+      targetPort: 6060
+    - name: clair-health
+      port: 6061
+      protocol: TCP
+      targetPort: 6061
+    selector:
+      deploymentconfig: clair
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: clair-api
+    labels:
+      app: clair
+  spec:
+    port:
+      targetPort: clair-api
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: clair
+      weight: 100
+    wildcardPolicy: None
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: clair-health
+    labels:
+      app: clair
+  spec:
+    port:
+      targetPort: clair-health
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: clair
+      weight: 100
+    wildcardPolicy: None
+parameters:
+- description: "PostgreSQL database user for connection"
+  name: POSTGRES_USERNAME
+  required: true
+  value: "postgres"
+- description: "PostgreSQL database password for connection"
+  name: POSTGRES_PASSWORD
+  required: true
+  value: "password"
+- description: "Service IP or service url of postgresql database"
+  name: POSTGRES_IP
+  required: true
+  value: "postgresql-clair"
+- description: "TCP port of PostgreSQL database"
+  name: POSTGRES_PORT
+  required: true
+  value: "5432"
+- description: "The name of the used database for clair"
+  name: POSTGRES_DATABASE
+  required: true
+  value: "clairdb"
+- description: "Docker registry server where the image resides"
+  name: IMAGE_SERVER
+  required: true
+  value: "docker.io"
+- description: Namespace where the imagestream resides
+  name: IMAGE_STREAM_NAMESPACE
+  required: true
+  value: "sankosa"
+- description: "Name of the image"
+  name: IMAGE_NAME
+  required: true
+  value: "clair-openshift"
+- description: Tag for the imagestream
+  name: IMAGE_STREAM_TAG
+  required: true
+  value: "1.0"
