@@ -32,7 +32,8 @@ ADD         scripts/run-clair.sh /clair/bin/
 RUN         chmod 660 /clair/config/config.yaml.template && \
             chmod 660 /clair/config/config.yaml && \
             chmod 660 /clair/bin/run-clair.sh && \
-            chmod a+x /clair/bin/run-clair.sh
+            chmod a+x /clair/bin/run-clair.sh && \
+            chmod g=u /etc/passwd
 
 ENTRYPOINT ["/clair/bin/run-clair.sh"]
 
