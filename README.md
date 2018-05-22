@@ -34,7 +34,7 @@ oc new-app -f /path/to/the/template/file/clair-openshift-template.yaml \
    -p POSTGRES_DATABASE="<database_name>" \
    -p IMAGE_SERVER=<registry_server:port> \
    -p IMAGE_STREAM_NAMESPACE="<namespace>" \
-   -p IMAGE_NAME="clair-opensift" \
+   -p IMAGE_NAME="clair-openshift" \
    -p IMAGE_STREAM_TAG="<clair-openshift-image-tag>"
 ```
 
