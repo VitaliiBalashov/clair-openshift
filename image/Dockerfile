@@ -9,6 +9,7 @@ RUN         yum update -y && \
 
 ENV         GOPATH /go
 ENV         PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+ENV         BZR_LOG /clair/bzr/bzr.log
 
 RUN         mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
             chmod -R 770 "$GOPATH" && \
@@ -17,8 +18,11 @@ RUN         mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
             mkdir /clair && \
             mkdir /clair/config && \
             touch /clair/config/config.yaml && \
+            mkdir /clair/bzr && \
             mkdir /clair/bin && \
             chmod 770 /clair && \
+            chmod 770 /clair/bzr && \
+            chmod 660 /clair/bzr/bzr.log && \
             cp /go/bin/clair /clair/bin/
 
 ADD         config/config.yaml.template /clair/config/
