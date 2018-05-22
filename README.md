@@ -61,6 +61,6 @@ First of all you have to change project where your clair-openshift is installed:
 
 Now you can delete all off the created resource with the following command:
 
-`oc delete imagestream,deploymentconfig,route,service --selector="app=appagile-kafka-manager"`
+`oc delete imagestream,deploymentconfig,route,service --selector="app=clair"`
 
 At the end don't forget to delete the installed PostgreSQL database too.
