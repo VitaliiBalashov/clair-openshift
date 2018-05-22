@@ -19,6 +19,7 @@ RUN         mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
             mkdir /clair/config && \
             touch /clair/config/config.yaml && \
             mkdir /clair/bzr && \
+            touch /clair/bzr/bzr.log && \
             mkdir /clair/bin && \
             chmod 770 /clair && \
             chmod 770 /clair/bzr && \
