@@ -13,7 +13,9 @@ ENV         BZR_LOG /clair/bzr/bzr.log
 
 RUN         mkdir -p "$GOPATH/src" "$GOPATH/bin" && \
             chmod -R 770 "$GOPATH" && \
-            go get github.com/coreos/clair && \
+            mkdir -p $GOPATH/src/github.com/coreos && \
+            cd /$GOPATH/src/github.com/coreos && \
+            git clone -b release-2.0 https://github.com/coreos/clair.git && \
             go install github.com/coreos/clair/cmd/clair && \
             mkdir /clair && \
             mkdir /clair/config && \
